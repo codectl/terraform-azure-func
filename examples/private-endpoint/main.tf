@@ -1,25 +1,34 @@
 module "naming" {
-  source  = "cloudnationhq/naming/azure"
-  version = "~> 0.32"
+  source  = "codectl/naming/azure"
+  version = "~> 0.1"
 
   suffix = ["demo", "dev"]
 }
 
+module "regions" {
+  source  = "codectl/locations/azure"
+  version = "~> 1.0"
+
+  location = {
+    primary = "swedencentral"
+  }
+}
+
 module "rg" {
-  source  = "cloudnationhq/rg/azure"
-  version = "~> 3.0"
+  source  = "codectl/rg/azure"
+  version = "~> 1.0"
 
   groups = {
     demo = {
       name     = module.naming.resource_group.name_unique
-      location = "swedencentral"
+      location = module.regions.location.primary.name
     }
   }
 }
 
 module "storage" {
-  source  = "cloudnationhq/sa/azure"
-  version = "~> 5.0"
+  source  = "codectl/sa/azure"
+  version = "~> 1.0"
 
   storage = {
     name                = module.naming.storage_account.name_unique
@@ -29,8 +38,8 @@ module "storage" {
 }
 
 module "private_dns" {
-  source  = "cloudnationhq/pdns/azure"
-  version = "~> 5.0"
+  source  = "codectl/pdns/azure"
+  version = "~> 1.0"
 
   resource_group_name = module.rg.groups.demo.name
 
@@ -50,8 +59,8 @@ module "private_dns" {
 }
 
 module "privatelink" {
-  source  = "cloudnationhq/pe/azure"
-  version = "~> 3.0"
+  source  = "codectl/pe/azure"
+  version = "~> 1.0"
 
   resource_group_name = module.rg.groups.demo.name
   location            = module.rg.groups.demo.location
@@ -74,8 +83,8 @@ module "privatelink" {
 }
 
 module "network" {
-  source  = "cloudnationhq/vnet/azure"
-  version = "~> 10.0"
+  source  = "codectl/vnet/azure"
+  version = "~> 1.0"
 
 
   vnet = {
@@ -105,8 +114,8 @@ module "network" {
 }
 
 module "service_plan" {
-  source  = "cloudnationhq/plan/azure"
-  version = "~> 4.0"
+  source  = "codectl/plan/azure"
+  version = "~> 1.0"
 
   plans = {
     plan1 = {
@@ -121,8 +130,8 @@ module "service_plan" {
 }
 
 module "function_app" {
-  source  = "cloudnationhq/func/azure"
-  version = "~> 4.0"
+  source  = "codectl/func/azure"
+  version = "~> 1.0"
 
   resource_group_name = module.rg.groups.demo.name
   location            = module.rg.groups.demo.location
